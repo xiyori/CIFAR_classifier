@@ -6,22 +6,20 @@ import torch.tensor as Tensor
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 164, 5)
+        self.conv1 = nn.Conv2d(3, 112, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        # self.drop = nn.Dropout2d(0.1)
-        self.conv2 = nn.Conv2d(164, 16, 5)
-        # self.norm = nn.BatchNorm1d(112 * 5 * 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 192)
-        self.fc2 = nn.Linear(192, 164)
-        self.fc3 = nn.Linear(164, 10)
+        self.conv2 = nn.Conv2d(112, 56, 5, padding=2)
+        self.conv3 = nn.Conv2d(56, 164, 5, padding=3)
+        self.conv4 = nn.Conv2d(164, 64, 3, padding=2)
+        self.fc1 = nn.Linear(64 * 3 * 3, 192)
+        self.fc2 = nn.Linear(192, 10)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.pool(F.relu(self.conv1(x)))
-        # x = self.drop(x)
         x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        # x = self.norm(x)
+        x = self.pool(F.relu(self.conv3(x)))
+        x = self.pool(F.relu(self.conv4(x)))
+        x = x.view(-1, 64 * 3 * 3)
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.fc2(x)
         return x
