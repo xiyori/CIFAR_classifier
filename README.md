@@ -1,2 +1,2 @@
 # CIFAR_classifier
-Simple feed-forward CIFAR10 classifier. Accuracy 72%
+Simple feed-forward CIFAR10 classifier. Accuracy 79%
