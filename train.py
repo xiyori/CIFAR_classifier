@@ -1,39 +1,23 @@
 import torch
-import torchvision
-import model_conv_overfit as model
-import torch.optim as optim
 import torch.nn as nn
 import dataset as ds
+import algorithm
+import scheduler
+import log
+import validation
 
-if __name__ == "__main__":
-    # Shows some images in the dataset
-    # dataiter = iter(ds.trainloader)
-    # images, labels = dataiter.next()
-    #
-    # ds.imshow(torchvision.utils.make_grid(images))
-    # print(' '.join((ds.classes[labels[j]] for j in range(ds.batch_count))))
 
-    # Try to use GPU
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print(device)
-
-    # Create an instance of the model
-    net = model.Net()
-    net.cuda()
-    # PATH = './cifar_net_tmp.pth'
-    # net.load_state_dict(torch.load(PATH))
-
-    # Use gradient descent for learning
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.000001, momentum=0.9)
-
-    # Train model for 'epoch_count' epochs
-    epoch_count = 1
+# Train model for 'epoch_count' epochs
+def train(net: nn.Module, epoch_count: int) -> None:
+    criterion = algorithm.get_loss()
     for data_iter in range(epoch_count):
+        optimizer = algorithm.get_optimizer(net,
+                                            scheduler.params_list[data_iter])
+
         average_loss = 0.0
         correct = 0
         total = 0
-        for i, data in enumerate(ds.trainloader, 0):
+        for _, data in enumerate(ds.trainloader, 0):
             inputs, labels = data
             inputs = inputs.cuda()
             labels = labels.cuda()
@@ -41,6 +25,8 @@ if __name__ == "__main__":
             optimizer.zero_grad()
 
             outputs = net(inputs)
+
+            # stats
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
@@ -50,17 +36,17 @@ if __name__ == "__main__":
             optimizer.step()
 
             average_loss += loss.item()
-            if i % 2000 == 1999:
-                print('[%d, %5d] average loss: %.3f' %
-                      (data_iter + 1, i + 1, average_loss / 2000))
-                average_loss = 0.0
-        print('Train accuracy: %d %%' % (
-                100 * correct / total))
-        # if (data_iter + 1) % 5 == 0:
-        #     PATH = './cifar_net_tmp_%d.pth' % (data_iter + 1)
-        #     torch.save(net.state_dict(), PATH)
-    print('Complete')
 
-    # Save our beautiful model for future generations
-    PATH = './cifar_net_tmp.pth'
-    torch.save(net.state_dict(), PATH)
+        average_loss /= 50000
+        train_accuracy = 100 * correct // total
+        test_accuracy = validation.test(net)
+        log.add((train_accuracy, test_accuracy, average_loss))
+        print('[%d, %5d] average loss: %.3f' %
+              (data_iter + 1, total, average_loss))
+        print('Train accuracy: %d %%' % train_accuracy)
+        print('Test accuracy: %d %%' % test_accuracy)
+
+        PATH = 'model/net_tmp_epoch_%d_acc_%d.pth' % (data_iter + 1, test_accuracy)
+        torch.save(net.state_dict(), PATH)
+        log.save()
+    print('Complete')
