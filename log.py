@@ -27,7 +27,15 @@ def plot() -> None:
 
     par1 = host.twinx()
 
-    host.set_ylim(0, 100)
+    log_min = min(min(log[0]), min(log[1]))
+    log_max = max(max(log[0]), max(log[1]))
+    log_height = log_max - log_min
+    host.set_ylim(log_min - log_height / 10, log_max + log_height / 10)
+
+    log_min = min(log[2])
+    log_max = max(log[2])
+    log_height = log_max - log_min
+    par1.set_ylim(log_min - log_height / 10, log_max + log_height / 10)
 
     host.set_xlabel("Epoch")
     host.set_ylabel("Accuracy")
@@ -36,8 +44,6 @@ def plot() -> None:
     for i in range(2):
         p1, = host.plot([j for j in range(len(log[i]))], log[i], label=labels[i])
     p2, = par1.plot([j for j in range(len(log[2]))], log[2], label=labels[2])
-
-    par1.set_ylim(0, max(log[2]) * 1.5)
 
     host.legend()
 
