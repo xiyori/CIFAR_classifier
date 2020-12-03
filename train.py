@@ -3,16 +3,16 @@ import torch.nn as nn
 import dataset as ds
 import algorithm
 import scheduler
-import log
+import log_tensorboard as log
 import validation
 
 
 # Train model for 'epoch_count' epochs
 def train(net: nn.Module, epoch_count: int) -> None:
     criterion = algorithm.get_loss()
-    for data_iter in range(epoch_count):
+    for epoch_idx in range(epoch_count):
         optimizer = algorithm.get_optimizer(net,
-                                            scheduler.params_list[data_iter])
+                                            scheduler.params_list[epoch_idx])
 
         average_loss = 0.0
         correct = 0
@@ -40,13 +40,13 @@ def train(net: nn.Module, epoch_count: int) -> None:
         average_loss /= 50000
         train_accuracy = 100 * correct // total
         test_accuracy = validation.test(net)
-        log.add((train_accuracy, test_accuracy, average_loss))
+        log.add((train_accuracy, test_accuracy, average_loss), epoch_idx)
         print('[%d, %5d] average loss: %.3f' %
-              (data_iter + 1, total, average_loss))
+              (epoch_idx + 1, total, average_loss))
         print('Train accuracy: %d %%' % train_accuracy)
         print('Test accuracy: %d %%' % test_accuracy)
 
-        PATH = 'model/net_tmp_epoch_%d_acc_%d.pth' % (data_iter + 1, test_accuracy)
+        PATH = 'model/net_tmp_epoch_%d_acc_%d.pth' % (epoch_idx + 1, test_accuracy)
         torch.save(net.state_dict(), PATH)
         log.save()
     print('Complete')

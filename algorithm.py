@@ -1,9 +1,10 @@
 import torch.optim as optim
 import torch.nn as nn
+import loss
 
 
 def get_loss() -> nn.Module:
-    return nn.CrossEntropyLoss()
+    return loss.BestCrossEntropyLossEver()
 
 
 def get_optimizer(net: nn.Module, params: list) -> optim.Optimizer:

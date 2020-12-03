@@ -54,7 +54,8 @@ def plot() -> None:
     plt.show()
 
 
-def add(values: tuple) -> None:
+def add(values: tuple, epoch_idx: int) -> None:
     global log
-    for i in range(3):
+    for i in range(len(values)):
         log[i].append(values[i])
+    print("Epoch", epoch_idx, "added to math log")
