@@ -16,7 +16,7 @@ def train(net: nn.Module, epoch_count: int) -> None:
 
         average_loss = 0.0
         correct = 0
-        total = 0
+        total = len(ds.trainloader.dataset)
         for _, data in enumerate(ds.trainloader, 0):
             inputs, labels = data
             inputs = inputs.cuda()
@@ -28,7 +28,6 @@ def train(net: nn.Module, epoch_count: int) -> None:
 
             # stats
             _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
             loss = criterion(outputs, labels)
@@ -37,16 +36,16 @@ def train(net: nn.Module, epoch_count: int) -> None:
 
             average_loss += loss.item()
 
-        average_loss /= 50000
+        average_loss /= total
         train_accuracy = 100 * correct // total
-        test_accuracy = validation.test(net)
-        log.add((train_accuracy, test_accuracy, average_loss), epoch_idx)
-        print('[%d, %5d] average loss: %.3f' %
-              (epoch_idx + 1, total, average_loss))
+        test_accuracy, test_loss = validation.test(net)
+        log.add((train_accuracy, test_accuracy, average_loss, test_loss), epoch_idx)
+        print('[%d, %5d] average loss: %.3f, test loss: %.3f' %
+              (epoch_idx, total, average_loss, test_loss))
         print('Train accuracy: %d %%' % train_accuracy)
         print('Test accuracy: %d %%' % test_accuracy)
 
-        PATH = 'model/net_tmp_epoch_%d_acc_%d.pth' % (epoch_idx + 1, test_accuracy)
-        torch.save(net.state_dict(), PATH)
+        # PATH = 'model/net_tmp_epoch_%d_acc_%d.pth' % (epoch_idx, test_accuracy)
+        # torch.save(net.state_dict(), PATH)
         log.save()
     print('Complete')

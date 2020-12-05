@@ -1,12 +1,14 @@
 import torch
-import model_conv_fair as model
-# import log
+import model_conv_overfit as model
+import log_tensorboard as log
 import scheduler
 from train import train
 from test import test
 
 
 if __name__ == "__main__":
+    log.init("exp_1")
+
     # Try to use GPU
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)

@@ -1,7 +1,12 @@
 from torch.utils.tensorboard import SummaryWriter
 
-writer = SummaryWriter("log")
-labels = ["Train", "Test", "Loss"]
+writer = SummaryWriter("log/not_categorized")
+labels = ["Train Acc", "Test Acc", "Train Loss", "Test Loss"]
+
+
+def init(exp_id: str) -> None:
+    global writer
+    writer = SummaryWriter("log/" + exp_id)
 
 
 def save() -> None:
