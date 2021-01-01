@@ -1,2 +1,2 @@
 # CIFAR_classifier
-Simple feed-forward CIFAR10 classifier. Accuracy 79%
+Learning ConvNets with a simple CIFAR10 classifier. Accuracy 79%
