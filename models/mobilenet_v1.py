@@ -1,4 +1,6 @@
-'''MobileNet in PyTorch.
+'''Original Author's code: https://github.com/kuangliu/pytorch-cifar
+
+MobileNet in PyTorch.
 
 See the paper "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications"
 for more details.
