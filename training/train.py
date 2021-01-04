@@ -51,7 +51,7 @@ def train(net: nn.Module, epoch_count: int, start_epoch: int=0,
             loss.backward()
             optimizer.step()
 
-            average_loss += loss.item()
+            average_loss += loss.item() * outputs.shape[0]
 
             if curr_iter >= bar_step:
                 iter_bar.next(bar_step)
@@ -75,7 +75,7 @@ def train(net: nn.Module, epoch_count: int, start_epoch: int=0,
         print('Train accuracy: %d %%' % train_accuracy)
         print('Test accuracy: %d %%' % test_accuracy)
 
-        PATH = 'model_instances/net_tmp_epoch_%d_acc_%d.pth' % (epoch_idx, test_accuracy)
-        torch.save(net.state_dict(), PATH)
+        # PATH = 'model_instances/net_tmp_epoch_%d_acc_%d.pth' % (epoch_idx, test_accuracy)
+        # torch.save(net.state_dict(), PATH)
         log.save()
     print('Complete')

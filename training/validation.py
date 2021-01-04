@@ -17,7 +17,7 @@ def test(net: model.Net) -> (int, float, np.array):
             images = images.cuda()
             labels = labels.cuda()
             outputs = net(images)
-            average_loss += criterion(outputs, labels).item()
+            average_loss += criterion(outputs, labels).item() * outputs.shape[0]
             _, predicted = torch.max(outputs.data, 1)
             correct += (predicted == labels).sum().item()
             for i in range(len(labels)):
